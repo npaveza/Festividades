@@ -1,0 +1,35 @@
+<!-- navbar.html -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">Festividades</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto" id="menu">
+                <!-- Menú generado dinámicamente por JavaScript -->
+            </ul>
+        </div>
+    </div>
+</nav>
+<script src="js/script.js" defer></script>
+<ul id="menu" class="navbar navbar-expand-lg navbar-light bg-light">
+    <li class="nav-item">
+    <a class="nav-link" routerLink="/index">Inicio</a>
+    </li>
+    <li *ngIf="user" class="nav-item">
+    <a class="nav-link" routerLink="/ver-eventos">Ver Eventos</a>
+    </li>
+    <li *ngIf="user?.role === 'organizador'" class="nav-item">
+    <a class="nav-link" routerLink="/agregar-evento">Agregar Evento</a>
+    </li>
+    <li *ngIf="user" class="nav-item">
+    <a class="nav-link" href="#" (click)="logout()">Logout</a>
+    </li>
+    <li *ngIf="!user" class="nav-item">
+    <a class="nav-link" routerLink="/registro">Registro</a>
+    </li>
+    <li *ngIf="!user" class="nav-item">
+    <a class="nav-link" routerLink="/login">Login</a>
+    </li>
+</ul>
