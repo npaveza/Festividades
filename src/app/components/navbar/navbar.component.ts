@@ -1,5 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, importProvidersFrom, OnInit } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { AppComponent } from '../../app.component';
+
+bootstrapApplication(AppComponent, {
+  providers: [importProvidersFrom(CommonModule)],
+});
 
 interface User {
   role: string;
