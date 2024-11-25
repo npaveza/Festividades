@@ -1,1 +1,57 @@
-<p>agregar-evento works!</p>
+<div class="container mt-5">
+    <h2 class="text-center">Agregar Nuevo Evento</h2>
+    <form [formGroup]="eventoForm" (ngSubmit)="agregarEvento()" class="mt-4">
+        <div class="form-group">
+            <label for="nombre">Nombre del Evento</label>
+            <input type="text" id="nombre" class="form-control" formControlName="nombre" required />
+            <div *ngIf="eventoForm.get('nombre')?.invalid && eventoForm.get('nombre')?.touched" class="text-danger">
+                El nombre del evento es obligatorio.
+            </div>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="lugar">Lugar</label>
+            <input type="text" id="lugar" class="form-control" formControlName="lugar" required />
+            <div *ngIf="eventoForm.get('lugar')?.invalid && eventoForm.get('lugar')?.touched" class="text-danger">
+                El lugar es obligatorio.
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label for="fecha">Fecha</label>
+                <input type="date" id="fecha" class="form-control" formControlName="fecha" required />
+                <div *ngIf="eventoForm.get('fecha')?.invalid && eventoForm.get('fecha')?.touched" class="text-danger">
+                    Ingresa una fecha válida.
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="hora">Hora</label>
+                <input type="time" id="hora" class="form-control" formControlName="hora" required />
+                <div *ngIf="eventoForm.get('hora')?.invalid && eventoForm.get('hora')?.touched" class="text-danger">
+                    Ingresa una hora válida.
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="puestos">Lista de Puestos Artesanales</label>
+            <textarea id="puestos" class="form-control" formControlName="puestos" rows="3"></textarea>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="entrada">Valor Entrada</label>
+            <input type="number" id="entrada" class="form-control" formControlName="entrada" min="0" />
+            <small class="form-text text-muted">Dejar en 0 si es gratuita.</small>
+        </div>
+
+        <div class="form-check mt-3">
+            <input type="checkbox" id="estacionamiento" class="form-check-input" formControlName="estacionamiento" />
+            <label class="form-check-label" for="estacionamiento">¿Tiene estacionamiento?</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4 w-100" [disabled]="!eventoForm.valid">
+            Crear Evento
+        </button>
+    </form>
+</div>

@@ -1,0 +1,36 @@
+/* You can add global styles to this file, and also import other style files */
+.card {
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.evento-card {
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+}
+
+.evento-card:hover {
+    transform: translateY(-5px);
+}
+
+.logged-out {
+    display: none;
+}
+
+.logged-in {
+    display: none;
+}
+
+.organizador {
+    display: none;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .card {
+        margin: auto
+    }
+}

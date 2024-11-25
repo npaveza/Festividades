@@ -1,0 +1,13 @@
+<div class="container text-center mt-5">
+    <h1 class="display-4">Bienvenido a Festividades Locales</h1>
+    <p class="lead">Descubre, organiza y comenta eventos únicos en tu comunidad.</p>
+    <div class="mt-4">
+        <!-- Muestra los botones solo si no hay sesión iniciada -->
+        <ng-container *ngIf="!sesionIniciada">
+            <a routerLink="/login" class="btn btn-primary btn-lg me-3">Iniciar Sesión</a>
+            <a routerLink="/registro" class="btn btn-secondary btn-lg">Registrarse</a>
+        </ng-container>
+        <!-- Mensaje de bienvenida si hay sesión iniciada -->
+        <p *ngIf="sesionIniciada" class="mt-3">¡Hola! Ya has iniciado sesión.</p>
+    </div>
+</div>

@@ -1,37 +1,21 @@
-    <!-- Contenido principal -->
-    <div class="container mt-4">
-        <h2 class="mb-4">Eventos y Celebraciones</h2>
-        <div class="row" id="eventos-container">
-            <!-- Los eventos se cargarán dinámicamente aquí -->
+<div class="container mt-5">
+  <h1 class="text-center">Eventos Disponibles</h1>
+  <!-- Mensaje cuando no hay eventos -->
+  <div *ngIf="eventos.length === 0" class="text-center mt-5">
+    <p>No hay eventos disponibles por ahora.</p>
+  </div>
+  <!-- Lista de eventos -->
+  <div class="row mt-4" *ngIf="eventos.length > 0">
+    <div class="col-md-4 mb-4" *ngFor="let evento of eventos">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ evento.nombre }}</h5>
+          <p class="card-text"><strong>Fecha:</strong> {{ evento.fecha }}</p>
+          <p class="card-text">{{ evento.lugar }}</p>
+          <!-- Botón para ver el detalle del evento -->
+          <a class="btn btn-primary" [routerLink]="['/evento-detalle', evento.id]">Ver Detalle</a>
         </div>
+      </div>
     </div>
-
-    <!-- Modal para comentarios -->
-<div class="modal fade" id="comentariosModal" tabindex="-1" aria-labelledby="comentariosModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="comentariosModalLabel">Detalles del Evento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Lugar:</strong> <span id="comentariosModalLugar"></span></p>
-                <p><strong>Fecha:</strong> <span id="comentariosModalFecha"></span></p>
-                <p><strong>Hora:</strong> <span id="comentariosModalHora"></span></p>
-                
-                <h6>Comentarios:</h6>
-                <div id="comentarios-lista" class="mb-3">
-                    <!-- Aquí se mostrarán los comentarios existentes -->
-                </div>
-
-                <form id="comentarioForm">
-                    <div class="mb-3">
-                        <label for="comentario" class="form-label">Nuevo Comentario</label>
-                        <textarea class="form-control" id="comentario" rows="3" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Enviar Comentario</button>
-                </form>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
