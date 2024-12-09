@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
@@ -16,15 +17,28 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, HttpClientModule],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css'
 })
 export class LandingPageComponent {
   sesionIniciada: boolean = false; // Indica si hay sesión iniciada
 
+  // URL del JSON en S3
+  private readonly jsonUrl = 'https://fsiinpavez.s3.us-east-1.amazonaws.com/usuario.json';
+
+  constructor(private http: HttpClient) {}
+
   ngOnInit(): void {
-    // Verifica si hay un usuario actual en LocalStorage
-    this.sesionIniciada = !!localStorage.getItem('usuarioActual');
+    // Consultar el JSON en S3 para verificar si hay un usuario activo
+    this.http.get<any[]>(this.jsonUrl).subscribe(
+      (usuarios) => {
+        // Validar si existe un usuario marcado como "activo"
+        this.sesionIniciada = usuarios.some((usuario) => usuario.activo === true);
+      },
+      (error) => {
+        console.error('Error al obtener datos desde S3:', error);
+      }
+    );
   }
 }

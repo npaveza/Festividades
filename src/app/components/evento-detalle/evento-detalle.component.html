@@ -3,7 +3,8 @@
     <p class="text-muted text-center">{{ evento.fecha }} - {{ evento.hora }}</p>
     <p><strong>Lugar:</strong> {{ evento.lugar }}</p>
     <p><strong>Puestos disponibles:</strong> {{ evento.puestos }}</p>
-    <p><strong>Entrada:</strong> {{ evento.entrada }}</p>
+    <p><strong>Entrada:</strong> 
+        {{ evento.entrada === 0 ? 'Gratuito' : '$' + evento.entrada }}</p>
     <p><strong>Estacionamiento:</strong> {{ evento.estacionamiento ? 'Sí' : 'No' }}</p>
 
     <h3>Comentarios:</h3>

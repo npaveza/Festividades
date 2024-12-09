@@ -1,0 +1,14 @@
+[
+    {
+        "nombre": "NicolasOrg",
+        "email": "nicolas@org.cl",
+        "password": "486759!Np",
+        "tipoUsuario": "organizador"
+    },
+    {
+        "nombre": "NicolasInv",
+        "email": "nicolas@inv.cl",
+        "password": "486759!Np",
+        "tipoUsuario": "visitante"
+    }
+]

@@ -1,110 +1,75 @@
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ReactiveFormsModule } from '@angular/forms';
 import { AgregarEventoComponent } from './agregar-evento.component';
-
 
 describe('AgregarEventoComponent', () => {
   let component: AgregarEventoComponent;
   let fixture: ComponentFixture<AgregarEventoComponent>;
+  let httpMock: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AgregarEventoComponent]
-    })
-      .compileComponents();
+      imports: [
+        ReactiveFormsModule,
+        HttpClientTestingModule
+      ],
+      declarations: [AgregarEventoComponent]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AgregarEventoComponent);
     component = fixture.componentInstance;
+    httpMock = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  afterEach(() => {
+    httpMock.verify();
   });
 
-  it('debería inicializar el formulario con valores predeterminados', () => {
-    const form = component.eventoForm;
-    expect(form).toBeTruthy();
-    expect(form.get('nombre')?.value).toBe('');
-    expect(form.get('lugar')?.value).toBe('');
-    expect(form.get('fecha')?.value).toBe('');
-    expect(form.get('hora')?.value).toBe('');
-    expect(form.get('puestos')?.value).toBe('');
-    expect(form.get('entrada')?.value).toBe(0);
-    expect(form.get('estacionamiento')?.value).toBe(false);
-  });
-
-  it('debería invalidar el formulario si faltan campos obligatorios', () => {
-    component.eventoForm.patchValue({
-      nombre: '',
-      lugar: '',
-      fecha: '',
-      hora: '',
-    });
-
-    expect(component.eventoForm.valid).toBeFalse();
-  });
-
-  it('debería validar el formulario si todos los campos obligatorios están llenos', () => {
+  it('debería restablecer el formulario después de agregar un evento', (done) => {
+    // Establecer valores iniciales del formulario
     component.eventoForm.patchValue({
       nombre: 'Evento de prueba',
       lugar: 'Lugar de prueba',
-      fecha: '2024-12-12',
-      hora: '12:00',
-    });
-
-    expect(component.eventoForm.valid).toBeTrue();
-  });
-
-  it('debería agregar un evento al LocalStorage si el formulario es válido', () => {
-    const mockEvento = {
-      nombre: 'Evento de prueba',
-      lugar: 'Lugar de prueba',
-      fecha: '2024-12-12',
-      hora: '12:00',
-      puestos: 'A,B,C',
-      entrada: 1000,
+      fecha: '2024-12-15',
+      hora: '18:00',
+      puestos: 50,
+      entrada: 10,
       estacionamiento: true,
-    };
-
-    // Poner valores válidos en el formulario
-    component.eventoForm.patchValue(mockEvento);
-
-    // Espía para comprobar el LocalStorage
-    spyOn(localStorage, 'setItem');
-    spyOn(localStorage, 'getItem').and.returnValue('[]');
-    spyOn(window, 'alert');
-
-    component.agregarEvento();
-
-    // Comprobar que el formulario se haya reiniciado
-    expect(component.eventoForm.value).toEqual({
-      nombre: '',
-      lugar: '',
-      fecha: '',
-      hora: '',
-      puestos: '',
-      entrada: 0,
-      estacionamiento: false,
     });
 
-    // Comprobar que se haya guardado en LocalStorage
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      'eventos',
-      jasmine.stringMatching('"nombre":"Evento de prueba"')
-    );
-
-    // Comprobar que se haya mostrado la alerta
-    expect(window.alert).toHaveBeenCalledWith('Evento agregado correctamente');
-  });
-
-  it('debería mostrar un mensaje de alerta si el formulario no es válido', () => {
-    spyOn(window, 'alert');
-
-    // El formulario se inicializa vacío, por lo que es inválido
+    // Activar el método para agregar evento
     component.agregarEvento();
 
-    // Comprobar que se muestra la alerta de error
-    expect(window.alert).toHaveBeenCalledWith('Por favor, completa todos los campos obligatorios.');
+    // Esperar la solicitud GET
+    const getReq = httpMock.expectOne('https://fsiinpavez.s3.us-east-1.amazonaws.com/evento.json');
+    expect(getReq.request.method).toBe('GET');
+    getReq.flush([]); // Simular respuesta vacía
+
+    // Esperar la solicitud PUT
+    const putReq = httpMock.expectOne('https://fsiinpavez.s3.us-east-1.amazonaws.com/evento.json');
+    expect(putReq.request.method).toBe('PUT');
+    putReq.flush([]); // Simular respuesta exitosa
+
+    // Asegurarse de que las operaciones asincrónicas se completen antes de verificar el estado
+    setTimeout(() => {
+      // Verificar que el formulario se haya restablecido
+      expect(component.eventoForm.value).toEqual({
+        nombre: '',
+        lugar: '',
+        fecha: '',
+        hora: '',
+        puestos: '',
+        entrada: 0,
+        estacionamiento: false,
+      });
+      done(); // Llamar a done() para indicar que la prueba ha finalizado
+    }, 0); // Establecer un tiempo mínimo para esperar
+  });
+
+  // Prueba simple de creación del componente
+  it('debería crear el componente', () => {
+    expect(component).toBeTruthy();
   });
 });

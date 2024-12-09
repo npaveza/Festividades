@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -24,73 +25,108 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 @Component({
   selector: 'app-evento-detalle',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule],
+  imports: [RouterModule, CommonModule, FormsModule, HttpClientModule],
   templateUrl: './evento-detalle.component.html',
   styleUrl: './evento-detalle.component.css'
 })
 export class EventoDetalleComponent implements OnInit {
-  evento: any;
+  evento: any = null;
   nuevoComentario: string = ''; // Variable para el comentario nuevo
+  readonly jsonUrl = 'https://fsiinpavez.s3.us-east-1.amazonaws.com/evento.json';
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit() {
-    const eventos = JSON.parse(localStorage.getItem('eventos') || '[]');
     const id = this.route.snapshot.paramMap.get('id');
-    this.evento = eventos.find((e: any) => e.id === id);
+    if (id) {
+      this.cargarEvento(id);
+    } else {
+      console.error('No se proporcionó un ID válido.');
+    }
   }
 
   /**
-   * @param {string} comentario - Comentario a eliminar
-   * @description
-   * Elimina un comentario del evento
-   * **/
+   * Carga los detalles del evento desde el archivo JSON en S3
+   * @param {string} id - ID del evento a cargar
+   */
+  cargarEvento(id: string): void {
+    this.http.get<any[]>(this.jsonUrl).subscribe(
+      (data) => {
+        const eventos = data || [];
+        this.evento = eventos.find((e: any) => e.id === id);
 
-  confirmarEliminarComentario(comentario: string) {
-    if (confirm('¿Estás seguro de que deseas eliminar este comentario?')) {
-      this.eliminarComentario(comentario);
-    }
-  }
-  
-  eliminarComentario(comentario: string) {
-    const index = this.evento.comentarios.indexOf(comentario);
-    if (index !== -1) {
-      this.evento.comentarios.splice(index, 1); // Eliminar comentario
-
-      // Actualizar el evento en LocalStorage
-      const eventos = JSON.parse(localStorage.getItem('eventos') || '[]');
-      const indexEvento = eventos.findIndex((e: any) => e.id === this.evento.id);
-      if (indexEvento !== -1) {
-        eventos[indexEvento] = this.evento;
-        localStorage.setItem('eventos', JSON.stringify(eventos));
+        if (!this.evento) {
+          alert('No se encontró el evento solicitado.');
+          console.error('Evento no encontrado.');
+        }
+      },
+      (error) => {
+        console.error('Error al cargar el archivo JSON desde S3:', error);
+        alert('No se pudieron cargar los detalles del evento. Revisa la configuración.');
       }
-
-      alert('Comentario eliminado correctamente.');
-    }
+    );
   }
 
   /**
-   * @param {string} nuevoComentario - Comentario a agregar
-   * @description
-   * Agrega un comentario al evento
-   * **/
-
-  agregarComentario() {
+   * Agrega un comentario al evento y lo actualiza en S3
+   */
+  agregarComentario(): void {
     if (this.nuevoComentario.trim()) {
       this.evento.comentarios.push(this.nuevoComentario); // Agregar comentario
 
-      // Actualizar el evento en LocalStorage
-      const eventos = JSON.parse(localStorage.getItem('eventos') || '[]');
-      const index = eventos.findIndex((e: any) => e.id === this.evento.id);
-      if (index !== -1) {
-        eventos[index] = this.evento;
-        localStorage.setItem('eventos', JSON.stringify(eventos));
-      }
+      // Actualizar el archivo JSON en S3
+      this.actualizarEventosEnS3();
 
       this.nuevoComentario = ''; // Limpiar el input del comentario
       alert('Comentario agregado correctamente.');
     } else {
       alert('El comentario no puede estar vacío.');
     }
+  }
+
+  /**
+   * Elimina un comentario del evento y lo actualiza en S3
+   * @param {string} comentario - Comentario a eliminar
+   */
+  confirmarEliminarComentario(comentario: string): void {
+    if (confirm('¿Estás seguro de que deseas eliminar este comentario?')) {
+      const index = this.evento.comentarios.indexOf(comentario);
+      if (index !== -1) {
+        this.evento.comentarios.splice(index, 1); // Eliminar comentario
+
+        // Actualizar el archivo JSON en S3
+        this.actualizarEventosEnS3();
+
+        alert('Comentario eliminado correctamente.');
+      }
+    }
+  }
+
+  /**
+   * Actualiza el archivo JSON en S3 con los cambios realizados
+   */
+  actualizarEventosEnS3(): void {
+    this.http.get<any[]>(this.jsonUrl).subscribe(
+      (data) => {
+        const eventos = data || [];
+        const index = eventos.findIndex((e: any) => e.id === this.evento.id);
+        if (index !== -1) {
+          eventos[index] = this.evento;
+
+          this.http.put(this.jsonUrl, eventos).subscribe(
+            () => {
+              console.log('Archivo JSON actualizado en S3');
+            },
+            (error) => {
+              console.error('Error al actualizar el archivo JSON en S3:', error);
+              alert('No se pudo actualizar el archivo JSON. Revisa la configuración.');
+            }
+          );
+        }
+      },
+      (error) => {
+        console.error('Error al cargar el archivo JSON desde S3:', error);
+      }
+    );
   }
 }

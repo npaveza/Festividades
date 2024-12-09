@@ -1,0 +1,15 @@
+[
+    {
+        "id": "1732572608327",
+        "nombre": "Evento1",
+        "lugar": "Campo",
+        "fecha": "2024-12-12",
+        "hora": "12:00",
+        "puestos": "Cerveza Artesanal\nArtesanía local",
+        "entrada": 0,
+        "estacionamiento": true,
+        "comentarios": [
+            "Está gratis\n"
+        ]
+    }
+]
